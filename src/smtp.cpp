@@ -76,7 +76,9 @@ void smtp::authenticate(const string& username, const string& password, auth_met
 
 void smtp::submit(const message& msg)
 {
-    if (!msg.sender().address.empty())
+    if (!msg.return_path().address.empty())
+        _dlg->send("MAIL FROM: <" + msg.return_path().address + ">");
+    else if (!msg.sender().address.empty())
         _dlg->send("MAIL FROM: <" + msg.sender().address + ">");
     else
         _dlg->send("MAIL FROM: <" + msg.from().addresses.at(0).address + ">");
