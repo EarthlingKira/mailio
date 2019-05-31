@@ -72,6 +72,7 @@ const string message::ATEXT{"!#$%&'*+-./=?^_`{|}~"};
 const string message::DTEXT{"!#$%&'*+-.@/=?^_`{|}~"}; // atext with monkey
 const string message::FROM_HEADER{"From"};
 const string message::SENDER_HEADER{"Sender"};
+const string message::RETURN_PATH_HEADER{"Return-Path"};
 const string message::REPLY_TO_HEADER{"Reply-To"};
 const string message::TO_HEADER{"To"};
 const string message::CC_HEADER{"Cc"};
@@ -183,6 +184,25 @@ string message::sender_to_string() const
 {
     return format_address(_sender.name, _sender.address);
 }
+
+
+void message::return_path(const mail_address& mail)
+{
+    _return_path = mail;
+}
+
+
+mail_address message::return_path() const
+{
+    return _return_path;
+}
+
+
+string message::return_path_to_string() const
+{
+    return format_address(_return_path.name, _return_path.address);
+}
+
 
 void message::reply_address(const mail_address& mail)
 {
@@ -369,6 +389,7 @@ string message::format_header() const
 
     header += FROM_HEADER + COLON + from_to_string() + codec::CRLF;
     header += _sender.address.empty() ? "" : SENDER_HEADER + COLON + sender_to_string() + codec::CRLF;
+    header += _return_path.address.empty() ? "" : RETURN_PATH_HEADER + COLON + return_path_to_string() + codec::CRLF;
     header += _reply_address.name.empty() ? "" : REPLY_TO_HEADER + COLON + reply_address_to_string() + codec::CRLF;
     header += TO_HEADER + COLON + recipients_to_string() + codec::CRLF;
     header += _cc_recipients.empty() ? "" : CC_HEADER + COLON + cc_recipients_to_string() + codec::CRLF;
@@ -432,6 +453,12 @@ void message::parse_header_line(const string& header_line)
         mailboxes mbx = parse_address_list(header_value);
         if (!mbx.addresses.empty())
             _sender = mbx.addresses[0];
+    }
+    else if (iequals(header_name, RETURN_PATH_HEADER))
+    {
+        mailboxes mbx = parse_address_list(header_value);
+        if (!mbx.addresses.empty())
+            _return_path = mbx.addresses[0];
     }
     else if (iequals(header_name, REPLY_TO_HEADER))
     {

@@ -156,6 +156,32 @@ public:
     std::string sender_to_string() const;
 
     /**
+    Setting the Return-Path to the given address.
+
+    This is used for bounce messages by the relaying SMTP.
+
+    @param mail Mail address to set.
+    **/
+    void return_path(const mail_address& mail);
+
+    /**
+    Getting the Return-Path address.
+
+    This is used for bounce messages by the relaying SMTP.
+
+    @return Sender mail address.
+    **/
+    mail_address return_path() const;
+
+    /**
+    Formatting the Return-Path as string.
+
+    @return  Return-Path address as formatted string.
+    @throw * `format_address(const string&, const string&)`.
+    **/
+    std::string return_path_to_string() const;
+
+    /**
     Setting the reply address.
 
     @param mail Reply mail address.
@@ -344,6 +370,11 @@ protected:
     static const std::string SENDER_HEADER;
 
     /**
+    `Return-Path` header name.
+    **/
+    static const std::string RETURN_PATH_HEADER;
+
+    /**
     `Reply-To` header name.
     **/
     static const std::string REPLY_TO_HEADER;
@@ -488,6 +519,11 @@ protected:
     Sender name and address.
     **/
     mail_address _sender;
+
+    /**
+    Return-Path address.
+    **/
+    mail_address _return_path;
 
     /**
     Reply address.
